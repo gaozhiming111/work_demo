@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>带logo二维码</title>
+		<style>
+			body {
+				background-color: antiquewhite;
+			}
+
+			.qrcode-box {
+				width: 276px;
+				padding: 10px;
+				box-shadow: 0 0 6px #333;
+			}
+
+			.title {
+				width: 256px;
+				height: 40px;
+				line-height: 40px;
+				padding: 0 10px 10px 10px;
+				text-align: center;
+			}
+
+			.qrcode {
+				padding: 10px;
+				border: 1px solid #000;
+			}
+
+			.btn-box {
+				padding: 10px 0;
+			}
+
+			.btn-box>button {
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="qrcode-box" id="qrcodeBox">
+			<div class="title">智慧城市</div>
+			<div id="qrcode" class="qrcode"></div>
+		</div>
+		<div class="btn-box">
+			<button id="btn">点击转为图片并下载</button>
+		</div>
+	</body>
+	<script src="../js/jquery.js"></script>
+	<script src="../js/bluebird.js"></script>
+	<script src="../js/html2canvas.min.js"></script>
+	<script src="../js/qrcode.js"></script>
+	<script src="../js/utf.js"></script>
+	<script src="../js/jquery.qrcode.js" ></script>
+	<script>
+		function makeCode(url) {
+			$("#qrcode").qrcode({
+				render: "canvas",
+				text: url,
+				width : "256",               //二维码的宽度
+				height : "256",              //二维码的高度
+				background : "#ffffff",       //二维码的后景色
+				foreground : "#000000",        //二维码的前景色
+				src: '../img/logo.png'             //二维码中间的图片
+			});
+		}
+		function createQrcode() {
+			var url = 'http://192.168.1.196:9006/lnrf-t/appversion/app-apk/20221215/2022/12/15/01ecab23e72c4adebfcc55704289e982.apk';//$('#url').val();
+			makeCode(url);
+		}
+		
+		window.onload = function() {
+			createQrcode();
+		}
+		// canvas生成图片
+		$("#btn").on("click", function() {
+			var getPixelRatio = function(context) { // 获取设备的PixelRatio
+				var backingStore = context.backingStorePixelRatio ||
+					context.webkitBackingStorePixelRatio ||
+					context.mozBackingStorePixelRatio ||
+					context.msBackingStorePixelRatio ||
+					context.oBackingStorePixelRatio ||
+					context.backingStorePixelRatio || 0.5;
+				return (window.devicePixelRatio || 0.5) / backingStore;
+			};
+			//生成的图片名称
+			var imgName = "智慧城市.jpg";
+			var shareContent = document.getElementById("qrcodeBox");
+			var width = shareContent.offsetWidth;
+			var height = shareContent.offsetHeight;
+			var canvas = document.createElement("canvas");
+			var context = canvas.getContext('2d');
+			var scale = getPixelRatio(context); //将canvas的容器扩大PixelRatio倍，再将画布缩放，将图像放大PixelRatio倍。
+			canvas.width = width * scale;
+			canvas.height = height * scale;
+			canvas.style.width = width + 'px';
+			canvas.style.height = height + 'px';
+			context.scale(scale, scale);
+
+			var opts = {
+				scale: scale,
+				canvas: canvas,
+				width: width,
+				height: height,
+				dpi: window.devicePixelRatio
+			};
+			html2canvas(shareContent, opts).then(function(canvas) {
+				context.imageSmoothingEnabled = false;
+				context.webkitImageSmoothingEnabled = false;
+				context.msImageSmoothingEnabled = false;
+				context.imageSmoothingEnabled = false;
+				var dataUrl = canvas.toDataURL('image/jpeg', 1.0);
+				dataURIToBlob(imgName, dataUrl, callback);
+			});
+		});
+
+		// edited from https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#Polyfill
+		var dataURIToBlob = function(imgName, dataURI, callback) {
+			var binStr = atob(dataURI.split(',')[1]),
+				len = binStr.length,
+				arr = new Uint8Array(len);
+
+			for (var i = 0; i < len; i++) {
+				arr[i] = binStr.charCodeAt(i);
+			}
+
+			callback(imgName, new Blob([arr]));
+		}
+
+		var callback = function(imgName, blob) {
+			var triggerDownload = $("<a>").attr("href", URL.createObjectURL(blob)).attr("download", imgName).appendTo(
+				"body").on("click", function() {
+				if (navigator.msSaveBlob) {
+					return navigator.msSaveBlob(blob, imgName);
+				}
+			});
+			triggerDownload[0].click();
+			triggerDownload.remove();
+		};
+	</script>
+</html>
