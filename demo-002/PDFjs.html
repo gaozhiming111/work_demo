@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>PDF预览</title>
+		<link rel="stylesheet" href="./plugins/pdfjs/web/viewer.css" />
+		<style>
+			.pdfobject-container { 
+				height: 50rem; 
+				border: 1px solid rgba(0,0,0,.1); }
+		</style>
+	</head>
+	<body>
+		<!--a标签预览-->
+		<div>
+			a标签预览：
+			<a href="http://127.0.0.1:8848/前端/work_demo/demo-002/doc/程序员英语词汇1700词.pdf" target="_blank">a标签预览</a>
+		</div>
+		<br>
+		<!--PDFjs插件预览-->
+		<div>
+			PDFjs插件预览:
+			<a href="./plugins/pdfjs/web/viewer.html?file=http://127.0.0.1:8848/前端/work_demo/demo-002/doc/程序员英语词汇1700词.pdf" target="_blank">PDFjs插件预览</a>
+		</div>
+		<br>
+		<!--iframe标签预览-->
+		iframe标签预览:
+		<iframe
+			src='http://127.0.0.1:8848/前端/work_demo/demo-002/doc/程序员英语词汇1700词.pdf' width='100%' height='100%' frameborder='1'>
+		</iframe>
+		<br>
+		<!--jquery.media.js插件预览-->
+		jquery.media.js插件预览:
+		<div class="panel-body">
+		    <a class="media" href="http://127.0.0.1:8848/前端/work_demo/demo-002/doc/程序员英语词汇1700词.pdf"></a>  
+		</div>
+		<br>
+		<!--PDFobject.js插件预览-->
+		PDFobject.js插件预览:
+		<div id="example1"></div>
+	</body>
+	<script src="plugins/jqueryMedia/jquery.min.js"></script>
+	<script src="plugins/jqueryMedia/jquery.media.js"></script>
+	<script src="plugins/pdfobject/pdfobject.min.js"></script>
+	<script>
+		$(function() {  
+		    $('a.media').media({
+				width:800, 
+				height:600,
+			});  
+		});
+		
+		PDFObject.embed("http://127.0.0.1:8848/前端/work_demo/demo-002/doc/程序员英语词汇1700词.pdf", "#example1");
+	</script>
+</html>
