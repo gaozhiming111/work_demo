@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>打包下载</title>
+	</head>
+	<body>
+		<button onclick="download()">打包下载</button>
+	</body>
+	<!-- 文件压缩 -->
+	<script src="jszip/jszip.js"></script>
+	<!-- 文件下载 -->
+	<script src="jszip/FileSaver.js"></script>
+	<script>
+		// 打包下载
+		function download() {
+			let urlList = [
+				'文件地址1',
+				'文件地址2',
+				'...'
+			];
+			wdc(urlList); //压缩下载
+		};
+		
+		// 生成base64编码
+		function getBase64(imgUrl) {
+		    return new Promise(resolve => {
+		        window.URL = window.URL || window.webkitURL;
+		        var xhr = new XMLHttpRequest();
+		        xhr.open("get", imgUrl, true);
+		        xhr.responseType = "blob";
+		        xhr.onload = function () {
+		            if (this.status == 200) {
+		                //得到一个blob对象
+		                var blob = this.response;
+		                let oFileReader = new FileReader();
+		                oFileReader.onloadend = function (e) {
+		                    let base64 = e.target.result;
+		                    // 返回解码后的base64
+		                    resolve(base64)
+		                };
+		                oFileReader.readAsDataURL(blob);
+		            }
+		        }
+		        xhr.send();	
+		    });
+		}
+		
+		//压缩文件				
+		async function wdc(urlList) {		
+		    var vars = {};
+			// 创建一个JSZip实例：
+			var zip = new JSZip();
+			// 文件列表
+			var baseList = urlList;
+		    for(var i = 0;i < baseList.length; i++){
+		        // 动态生成变量，创建文件夹
+		        let varName = "file_" + i;
+		        vars[varName] = zip.folder("file_" + i);
+		        // 调用解码函数
+		        let base_photo = await getBase64(baseList[i])
+		        // 将文件写入到压缩文件
+		        vars[varName].file("file"+ i + ".png", base_photo.replace(/^data:file\/;base64,/, ""), {base64: true});
+		    }
+			//生成一个zip文件
+		    zip.generateAsync({type:"blob"}).then(function(content) {
+		        // see FileSaver.js
+		        saveAs(content, "files.zip");
+		    });
+		}
+	</script>
+</html>
